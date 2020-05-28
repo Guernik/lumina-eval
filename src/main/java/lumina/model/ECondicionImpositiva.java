@@ -16,7 +16,7 @@ public enum ECondicionImpositiva {
 
 		@Override
 		public Float porcentaje() {
-			return 0.105f;
+			return 0.1005f;
 		}
 		
 	},
