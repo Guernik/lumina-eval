@@ -1,7 +1,9 @@
-package lumina.model;
+package lumina.model.pedido;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import lumina.model.Cliente;
 
 /**
  * Inmutable

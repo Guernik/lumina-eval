@@ -3,7 +3,7 @@ package lumina.model.documentos_comerciales.factura;
 import java.math.BigDecimal;
 
 import lumina.model.Money;
-import lumina.model.Producto;
+import lumina.model.producto.Producto;
 
 
 /**

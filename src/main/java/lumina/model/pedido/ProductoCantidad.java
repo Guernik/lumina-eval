@@ -1,4 +1,6 @@
-package lumina.model;
+package lumina.model.pedido;
+
+import lumina.model.producto.Producto;
 
 /**
  * Inmutable

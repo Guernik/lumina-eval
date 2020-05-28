@@ -9,8 +9,8 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicLong;
 
-import lumina.model.Pedido;
 import lumina.model.documentos_comerciales.factura.Factura;
+import lumina.model.pedido.Pedido;
 
 public class Facturacion {
 	

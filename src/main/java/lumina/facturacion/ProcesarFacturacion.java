@@ -11,12 +11,12 @@ import java.util.concurrent.CompletableFuture;
 import lumina.exceptions.FootTotalCalculationException;
 import lumina.model.ECurrency;
 import lumina.model.Money;
-import lumina.model.Pedido;
-import lumina.model.ProductoCantidad;
 import lumina.model.documentos_comerciales.Cabecera;
 import lumina.model.documentos_comerciales.factura.DetalleFactura;
 import lumina.model.documentos_comerciales.factura.Factura;
 import lumina.model.documentos_comerciales.factura.PieFactura;
+import lumina.model.pedido.Pedido;
+import lumina.model.pedido.ProductoCantidad;
 
 
 

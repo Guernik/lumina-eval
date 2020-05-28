@@ -1,4 +1,6 @@
-package lumina.model;
+package lumina.model.producto;
+
+import lumina.model.Money;
 
 /**
  * Immutable
