@@ -1,9 +1,11 @@
 package lumina.model.pedido;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
 import lumina.model.Cliente;
+import lumina.model.Money;
 
 /**
  * Inmutable
@@ -32,14 +34,22 @@ public final class Pedido {
 
 
 
-	public final long getNumero_pedido() {
+	public long getNumero_pedido() {
 		return numero_pedido;
 	}
 
 
 
-	public final Cliente getCliente() {
+	public Cliente getCliente() {
 		return cliente;
+	}
+	
+	
+	public BigDecimal totalPedido() {
+		return this.productos.stream()
+						.map(ProductoCantidad::totalNeto)
+						.map(Money::getAmount)
+						.reduce(BigDecimal::add).get();
 	}
 
 

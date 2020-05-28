@@ -1,5 +1,8 @@
 package lumina.model.pedido;
 
+import java.math.BigDecimal;
+
+import lumina.model.Money;
 import lumina.model.producto.Producto;
 
 /**
@@ -30,6 +33,11 @@ public class ProductoCantidad {
 
 	public int getCantidad() {
 		return cantidad.intValue();
+	}
+	
+	public Money totalNeto () {		
+		BigDecimal total = producto.getPrecio().getAmount().multiply(BigDecimal.valueOf(getCantidad()));
+		return new Money(producto.getPrecio().getCurrency(),total);		
 	}
 	
 	
