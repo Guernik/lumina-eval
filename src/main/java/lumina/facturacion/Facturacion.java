@@ -2,8 +2,6 @@ package lumina.facturacion;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.Callable;
-import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -23,12 +21,12 @@ public class Facturacion {
 	private ExecutorService billing_executor = Executors.newFixedThreadPool(THREAD_CANT);
 	private ExecutorService observer_notifier = Executors.newFixedThreadPool(1);
 	
-	private List<CompletableFuture<Factura>> completables = new ArrayList<>();
 	
-	
-	
-	
-	
+	/**
+	 * Requerimiento 1.a "Recibir una colección de pedidos, realizar facturación"
+	 * @param lista_pedidos
+	 * @param billing_observer
+	 */
 	
 	public void facturar(List<Pedido> lista_pedidos, BillingObserver billing_observer) {
 		
@@ -44,19 +42,18 @@ public class Facturacion {
 			long next_billing_number = _billing_number.incrementAndGet();			
 
 			
-			Future<Factura> future = this.billing_executor.submit(new ProcesarFacturacionFuture(pedido, next_billing_number));
+			Future<Factura> future = this.billing_executor.submit(new ProcesarFacturacion(pedido, next_billing_number));
 		    
 			future_list.add(future);
-			
-		    List<Callable<Factura>> task_list = new ArrayList<>();						
+		 						
 		}
 		
 		List<Factura> facturas_list = new ArrayList<>();
 		
 		this.observer_notifier.submit( () -> {
-			for (Future<Factura> fut : future_list) {
+			for (Future<Factura> future_bill : future_list) {
 				try {
-					facturas_list.add (fut.get());
+					facturas_list.add (future_bill.get());
 				} catch (InterruptedException | ExecutionException e) {
 
 					e.printStackTrace();

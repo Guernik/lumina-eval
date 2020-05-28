@@ -6,7 +6,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.Callable;
-import java.util.concurrent.CompletableFuture;
 
 import lumina.exceptions.FootTotalCalculationException;
 import lumina.model.ECurrency;
@@ -20,25 +19,25 @@ import lumina.model.pedido.ProductoCantidad;
 
 
 
-public class ProcesarFacturacion implements Runnable {
+public class ProcesarFacturacion implements Callable<Factura>{
 
 	
 	private final Pedido pedido;
 	private long next_billing_number;
-	private CompletableFuture<Factura> completable;
 	
 	
 	
-	public ProcesarFacturacion(Pedido pedido, long next_billing_number, CompletableFuture<Factura> completable) {	
+	
+	public ProcesarFacturacion(Pedido pedido, long next_billing_number) {	
 		this.pedido = pedido;
 		this.next_billing_number = next_billing_number;
-		this.completable = completable;
+	
 	}
 
 
 
 	@Override
-	public void run() {
+	public Factura call() throws Exception {
 		// construir Cabecera
 		
 		Cabecera cabecera = construirCabecera();
@@ -48,7 +47,7 @@ public class ProcesarFacturacion implements Runnable {
 		PieFactura pie = construirPieFactura(detalles);		
 		
 		Factura factura = new Factura(cabecera, pie, detalles);
-		this.completable.complete(factura);
+		return factura;
 		
 	}
 
@@ -134,7 +133,7 @@ public class ProcesarFacturacion implements Runnable {
 	 * @return
 	 */
 	private BigDecimal montoIva(BigDecimal precio, float iva) {
-		BigDecimal iva_convertido = BigDecimal.valueOf(iva);
+		BigDecimal iva_convertido = new BigDecimal(Float.toString(iva));
 		return precio.multiply(iva_convertido);
 	}
 	
