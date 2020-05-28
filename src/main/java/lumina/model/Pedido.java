@@ -1,20 +1,31 @@
 package lumina.model;
 
+import java.util.ArrayList;
+import java.util.List;
+
+/**
+ * Inmutable
+ * @author emilio
+ *
+ */
 public final class Pedido {
 
 	private final long numero_pedido;
 	
 	private final Cliente cliente;
 	
-	private final DetallePedido detalle_pedido;
+	// Detalle del pedido
+	private final List<ProductoCantidad> productos;
 
 
 	
-	public Pedido(long numero_pedido, Cliente cliente, DetallePedido detalle_pedido) {	
-		// Cliente y DetallePedido son inmutables, por lo que no necesito copiarlas para garantizar mi inmutabilidad
+	public Pedido(long numero_pedido, Cliente cliente, List<ProductoCantidad> detalle_pedido) {	
+		/**
+		 * Cliente es  inmutable, por lo que no necesito copiarlo para garantizar mi inmutabilidad
+		 */
 		this.numero_pedido = numero_pedido;
 		this.cliente = cliente;
-		this.detalle_pedido = detalle_pedido;
+		this.productos = new ArrayList<ProductoCantidad>(detalle_pedido); // copiar lista
 	}
 
 
@@ -31,8 +42,11 @@ public final class Pedido {
 
 
 
-	public final DetallePedido getDetalle_pedido() {
-		return detalle_pedido;
+	public final List<ProductoCantidad> getProductos() {
+		/**
+		 * Devolver copia de la lista para mantener la inmutabilidad
+		 */
+		return new ArrayList<ProductoCantidad>(productos); 
 	}
 	
 	

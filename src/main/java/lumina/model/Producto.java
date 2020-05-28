@@ -17,7 +17,6 @@ public final class Producto {
 	
 	
 	public Producto(String codigo, String nombre, Money precio) {
-		super();
 		this.codigo = codigo;
 		this.nombre = nombre;
 		this.precio = precio;

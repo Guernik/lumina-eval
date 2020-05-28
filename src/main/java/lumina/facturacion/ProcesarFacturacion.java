@@ -1,48 +1,182 @@
 package lumina.facturacion;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.Callable;
+import java.util.concurrent.CompletableFuture;
 
+import lumina.exceptions.FootTotalCalculationException;
+import lumina.model.ECurrency;
+import lumina.model.Money;
 import lumina.model.Pedido;
+import lumina.model.ProductoCantidad;
 import lumina.model.documentos_comerciales.Cabecera;
-import lumina.model.documentos_comerciales.Factura;
+import lumina.model.documentos_comerciales.factura.DetalleFactura;
+import lumina.model.documentos_comerciales.factura.Factura;
+import lumina.model.documentos_comerciales.factura.PieFactura;
 
 
 
-public class ProcesarFacturacion implements Callable<Factura>{
+public class ProcesarFacturacion implements Runnable {
 
 	
 	private final Pedido pedido;
+	private long next_billing_number;
+	private CompletableFuture<Factura> completable;
 	
 	
 	
-	public ProcesarFacturacion(Pedido pedido) {	
+	public ProcesarFacturacion(Pedido pedido, long next_billing_number, CompletableFuture<Factura> completable) {	
 		this.pedido = pedido;
+		this.next_billing_number = next_billing_number;
+		this.completable = completable;
 	}
 
 
 
 	@Override
-	public Factura call() throws Exception {
-		
+	public void run() {
 		// construir Cabecera
 		
-		Cabecera cabecera = new Cabecera(
+		Cabecera cabecera = construirCabecera();
+		
+		List<DetalleFactura> detalles = construirCuerpoFactura();		
+		
+		PieFactura pie = construirPieFactura(detalles);		
+		
+		Factura factura = new Factura(cabecera, pie, detalles);
+		this.completable.complete(factura);
+		
+	}
+
+
+
+	private PieFactura construirPieFactura(List<DetalleFactura> detalles) {
+		Optional<BigDecimal> maybe_total = detalles.stream()
+				.map(DetalleFactura::getPrecioVenta)
+				.map(Money::getAmount)
+				.reduce(BigDecimal::add);
+		Optional<BigDecimal> maybe_total_iva = detalles.stream()
+		.map(DetalleFactura::getMontoIva)				
+		.reduce(BigDecimal::add);
+		
+		BigDecimal total_pie_factura = maybe_total.orElseThrow(() -> new FootTotalCalculationException());
+		BigDecimal total_iva = maybe_total_iva.orElseThrow(() -> new FootTotalCalculationException());
+		
+		
+		PieFactura pie = new PieFactura(new Money(ECurrency.ARS,total_pie_factura), total_iva);
+		return pie;
+
+	}
+
+
+
+	private List<DetalleFactura> construirCuerpoFactura() {
+		DetalleFactura.Builder builder;
+		List<DetalleFactura> detalles = new ArrayList<>();
+
+		for (ProductoCantidad item : pedido.getProductos()) {
+			builder = new DetalleFactura.Builder();
+
+			float iva = pedido.getCliente().getCondicion_impositiva().porcentaje();
+			BigDecimal precio = item.getProducto().getPrecio().getAmount(); 
+			
+		
+			Money precio_neto = calcularPrecioNeto(item);
+			Money precio_venta = calcularPrecioVenta(precio_neto, iva);
+			
+			BigDecimal monto_iva = montoIva(precio, iva);
+			
+			builder.producto(item.getProducto());
+			builder.precioUnitario(item.getProducto().getPrecio());
+			builder.porcentajeIva(iva);
+			builder.cantidad(item.getCantidad());
+			builder.precioVenta(precio_venta);
+			builder.precioNeto(precio_neto);
+			builder.montoIva(monto_iva);
+			DetalleFactura detalle = builder.build();
+			
+			detalles.add(detalle);
+			
+		}
+		return detalles;
+	}
+
+
+
+	private Cabecera construirCabecera() {
+		return new Cabecera(
 				LocalDate.now(),
-				null, //TODO
+				next_billing_number,
 				null, //TODO
 				pedido.getCliente().getCondicion_impositiva().letra(),
-				pedido.getCliente()); 
-		
-		// construir Detalle
-		pedido.getDetalle_pedido()
-		
-		// construir Pie
-		
-		// construir Factura
-		
-		
-		return null;
+				pedido.getCliente());
 	}
+	
+	/**
+	 * Suma el iva a un precio dado
+	 * @param precio
+	 * @param iva valor decimal del porcentaje de iva, ej: 0.21f
+	 * @return
+	 */
+	private BigDecimal sumarIva(BigDecimal precio, float iva) {
+		BigDecimal monto_iva = montoIva(precio,iva);		
+		return precio.add(monto_iva);
+	}
+	
+	/**
+	 * 
+	 * @param precio
+	 * @param iva
+	 * @return
+	 */
+	private BigDecimal montoIva(BigDecimal precio, float iva) {
+		BigDecimal iva_convertido = BigDecimal.valueOf(iva);
+		return precio.multiply(iva_convertido);
+	}
+	
+	/**
+	 * Devuelve multiplicacion entre precio y cantidad en tipo BigDecimal
+	 * @param precio
+	 * @param cantidad
+	 * @return
+	 */
+	private BigDecimal precioNeto(BigDecimal precio, Integer cantidad ) {
+		return precio.multiply(BigDecimal.valueOf(cantidad));
+	}
+	
+	
+	/**
+	 * 
+	 * @param item
+	 * @return
+	 */
+	private Money calcularPrecioNeto(ProductoCantidad item) {
+		Money precio = item.getProducto().getPrecio();
+		BigDecimal precio_neto = precioNeto(precio.getAmount(),item.getCantidad());
+		return new Money(ECurrency.ARS, precio_neto);
+	}
+	
+	/**
+	 * 
+	 * @param precio_neto
+	 * @param iva
+	 * @return
+	 */
+	private Money calcularPrecioVenta(Money precio_neto,float iva) {
+		
+		BigDecimal precio_venta = sumarIva(precio_neto.getAmount(),
+										pedido.getCliente().getCondicion_impositiva().porcentaje());
+		
+		return new Money(ECurrency.ARS, precio_venta);
+	}
+	
+	
+
+
+
 
 }
