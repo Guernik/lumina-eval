@@ -2,9 +2,6 @@ package lumina.facturacion;
 
 import java.io.FileNotFoundException;
 import java.io.PrintWriter;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.concurrent.BlockingQueue;

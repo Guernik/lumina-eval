@@ -46,7 +46,7 @@ public class ProcesarFacturacion implements Callable<Factura>{
 		
 		List<DetalleFactura> detalles = construirCuerpoFactura();		
 		
-		PieFactura pie = construirPieFactura(detalles);		
+		PieFactura pie = construirPieFactura(detalles);
 		
 		Factura factura = new Factura(cabecera, pie, detalles);
 		
