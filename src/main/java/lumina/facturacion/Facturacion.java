@@ -31,7 +31,7 @@ public class Facturacion {
 	 * @param billing_observer
 	 */
 	
-	public void facturar(List<Pedido> lista_pedidos, BillingObserver<List<Factura>> billing_observer) {
+	public void facturar(List<Pedido> lista_pedidos, BillingObserver billing_observer) {
 		
 		/**
 		 * Lista de futures donde se iran guardando los resultados
@@ -67,7 +67,7 @@ public class Facturacion {
 					e.printStackTrace();
 				}
 			}
-			billing_observer.notifyDone(facturas_list);
+			billing_observer.notifyBillingDone(facturas_list);
 			
 		});		
 	}
@@ -78,7 +78,7 @@ public class Facturacion {
 	 * @param facturas
 	 * @param billing_observer
 	 */
-	public void anularFacturas(List<Factura> facturas, BillingObserver<List<NotaCredito>> billing_observer) {
+	public void anularFacturas(List<Factura> facturas, BillingObserver billing_observer) {
 		/**
 		 * Lista de futures donde se iran guardando los resultados
 		 * de procesar cada una de las facturas
@@ -106,7 +106,7 @@ public class Facturacion {
 					e.printStackTrace();
 				}
 			}
-			billing_observer.notifyDone(notas_credito);			
+			billing_observer.notifyCancelBillDone(notas_credito);			
 		});		
 	}	
 	

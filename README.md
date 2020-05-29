@@ -2,6 +2,9 @@
 [![Build Status](https://travis-ci.com/Guernik/lumina-eval.svg?branch=master)](https://travis-ci.com/Guernik/lumina-eval)
 ## Evaluación a candidatos
 
+### Consideraciones
+> Para la generacion de las facturas y notas de credito, se utilizan dos Executors que generan las ordenes en hilos separados. Además se utiliza el patrón Observer para notificar cuando el proceso está terminado. De esta manera los metodos _facturar_ y _anularFacturas_ son totalmente asincrónicos.
+
 ### Dudas sobre el diseño a "consultar con el cliente"
 Las siguientes son una serie de dudas que fueron surgiendo durante el diseño, normalmente se consultarían con el cliente o product owner.
 * El archivo a enviar a ARBA no tiene forma de identificar si es factura o nota de crédito. Momentaneamente, las notas de credito se ingresan como valores negativos, pero seguramnete se debería consultar si es necesario el agregado de una columna
@@ -50,4 +53,5 @@ El patrón _state_ se utiliza para alterar el comportamiento de un determinado o
 
 ### TODO
  * Posible refactor de ProcesarFacturacion y ProcesarCancelacion
+ * 
 

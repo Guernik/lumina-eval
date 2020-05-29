@@ -24,8 +24,7 @@ public class TestBilling {
 
 	
 	private Facturacion facturacion;
-	BillingObserver<List<Factura>> billing_observer;
-	BillingObserver<List<NotaCredito>> anulation_observer;
+	BillingObserver billing_observer;	
 	BlockingQueue<List<Factura>> bill_queue;
 	BlockingQueue<List<NotaCredito>> credit_note_queue;
 	
@@ -40,25 +39,24 @@ public class TestBilling {
 		 * Simular un observer. El mismo sera notificado
 		 * cuando el proceso de todas las facturas termine
 		 */
-		billing_observer = (facturas) -> {
-			try {
-				bill_queue.put(facturas);
-			} catch (InterruptedException e) {
-				e.printStackTrace();
+		billing_observer = new BillingObserver() {			
+			@Override
+			public void notifyCancelBillDone(List<NotaCredito> lista_notas) {
+				try {
+					credit_note_queue.put(lista_notas);
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
 			}			
-		};
-
-		/**
-		 * Idem, observer para la cancelacion
-		 */
-		anulation_observer= (ontas_credito) -> {
-			try {
-				credit_note_queue.put(ontas_credito);
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}			
-		};
-		
+			@Override
+			public void notifyBillingDone(List<Factura> facturas_list) {				
+				try {
+						bill_queue.put(facturas_list);
+					} catch (InterruptedException e) {
+						e.printStackTrace();
+					}			
+				}			
+		};		
 	}
 	
 	
@@ -212,7 +210,7 @@ public class TestBilling {
 		/** Esperamos un tiempo prudencial a que se realice el proceso de facturacion */
 		List<Factura> facturas = bill_queue.poll(10, TimeUnit.SECONDS);
 				
-		facturacion.anularFacturas(facturas, anulation_observer);
+		facturacion.anularFacturas(facturas, billing_observer);
 		/** Esperamos un tiempo prudencial a que se realice el proceso de cancelacion */
 		List<NotaCredito> notas_credito= credit_note_queue.poll(10, TimeUnit.SECONDS);
 		
