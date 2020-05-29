@@ -4,7 +4,7 @@ import java.time.LocalDate;
 
 import lumina.model.Cliente;
 
-public class Cabecera {
+public final class Cabecera {
 	
 	private final LocalDate fecha_emision;
 	

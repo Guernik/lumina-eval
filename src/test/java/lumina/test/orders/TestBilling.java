@@ -22,7 +22,7 @@ public class TestBilling {
 
 	
 	private Facturacion facturacion;
-	BillingObserver observer;
+	BillingObserver<List<Factura>> observer;
 	BlockingQueue<List<Factura>> block_queue;
 	
 	@BeforeEach
@@ -104,8 +104,6 @@ public class TestBilling {
 		/**
 		 * Lo ideal seria un solo assert por test
 		 */
-		System.out.println(valor_factura_recibido);
-		System.out.println(valor_iva_recibido);
 		assertEquals(1, facturas.size());
 		assertEquals(0, valor_factura_esperado.compareTo(valor_factura_recibido));
 		assertEquals(0, valor_iva_esperado.compareTo(valor_iva_recibido));	

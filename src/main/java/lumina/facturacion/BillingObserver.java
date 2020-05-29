@@ -1,9 +1,5 @@
 package lumina.facturacion;
 
-import java.util.List;
-
-import lumina.model.documentos_comerciales.factura.Factura;
-
-public interface BillingObserver {
-	public void notifyBillingDone(List<Factura> facturas_list);
+public interface BillingObserver<T> {
+	public void notifyDone(T facturas_list);
 }
