@@ -10,7 +10,7 @@ import java.util.concurrent.Callable;
 import lumina.exceptions.FootTotalCalculationException;
 import lumina.model.ECurrency;
 import lumina.model.Money;
-import lumina.model.documentos_comerciales.Cabecera;
+import lumina.model.documentos_comerciales.factura.CabeceraFactura;
 import lumina.model.documentos_comerciales.factura.DetalleFactura;
 import lumina.model.documentos_comerciales.factura.Factura;
 import lumina.model.documentos_comerciales.factura.PieFactura;
@@ -40,7 +40,7 @@ public class ProcesarFacturacion implements Callable<Factura>{
 	public Factura call() throws Exception {
 		// construir Cabecera
 		
-		Cabecera cabecera = construirCabecera();
+		CabeceraFactura cabecera = construirCabecera();
 		
 		List<DetalleFactura> detalles = construirCuerpoFactura();		
 		
@@ -89,7 +89,7 @@ public class ProcesarFacturacion implements Callable<Factura>{
 			
 			BigDecimal monto_iva = montoIva(precio, iva);
 			
-			builder.producto(item.getProducto());
+			builder.producto(item.getProducto()); // TODO probablemente aquí debería ir el nombre/codigo del producto
 			builder.precioUnitario(item.getProducto().getPrecio());
 			builder.porcentajeIva(iva);
 			builder.cantidad(item.getCantidad());
@@ -106,8 +106,8 @@ public class ProcesarFacturacion implements Callable<Factura>{
 
 
 
-	private Cabecera construirCabecera() {
-		return new Cabecera(
+	private CabeceraFactura construirCabecera() {
+		return new CabeceraFactura(
 				LocalDate.now(),
 				next_billing_number,
 				null, //TODO

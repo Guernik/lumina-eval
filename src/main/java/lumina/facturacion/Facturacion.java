@@ -72,6 +72,12 @@ public class Facturacion {
 		});		
 	}
 	
+	
+	/**
+	 * Requerimiento 1.b. "Recibir una lista de facturas a anular y Realizar la cancelación de pedidos"
+	 * @param facturas
+	 * @param billing_observer
+	 */
 	public void anularFacturas(List<Factura> facturas, BillingObserver<List<NotaCredito>> billing_observer) {
 		/**
 		 * Lista de futures donde se iran guardando los resultados
