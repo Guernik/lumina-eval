@@ -16,7 +16,6 @@ public final class Money {
 	
 	
 	public Money(ECurrency currency, BigDecimal amount) {
-		super();
 		this.currency = currency;
 		this.amount = amount;
 	}

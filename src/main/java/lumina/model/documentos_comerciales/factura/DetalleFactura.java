@@ -25,7 +25,6 @@ public final class DetalleFactura {
 	
 	public DetalleFactura(Producto producto, Money precio_unitario, Float porcentaje_iva, Integer cantidad,
 			Money precio_venta, Money precio_neto, BigDecimal monto_iva) {
-		super();
 		this.producto = producto;
 		this.precio_unitario = precio_unitario;
 		this.porcentaje_iva = porcentaje_iva;

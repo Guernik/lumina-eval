@@ -8,8 +8,10 @@ import java.util.Optional;
 import java.util.concurrent.Callable;
 
 import lumina.exceptions.FootTotalCalculationException;
+import lumina.model.Cliente;
 import lumina.model.ECurrency;
 import lumina.model.Money;
+import lumina.model.Operatoria;
 import lumina.model.documentos_comerciales.factura.CabeceraFactura;
 import lumina.model.documentos_comerciales.factura.DetalleFactura;
 import lumina.model.documentos_comerciales.factura.Factura;
@@ -47,8 +49,29 @@ public class ProcesarFacturacion implements Callable<Factura>{
 		PieFactura pie = construirPieFactura(detalles);		
 		
 		Factura factura = new Factura(cabecera, pie, detalles);
+		
+//		 Datos para generar la operatoria diaria
+		Operatoria operatoria = construirOperatoria(factura.getPieFactura().getTotal());
+		OperatoriaDiaria.getInstance().getDailyOperations().put(operatoria);
+		
+		
+		
 		return factura;
 		
+	}
+
+
+
+	private Operatoria construirOperatoria(Money total) {
+		Cliente cliente = pedido.getCliente();
+		Operatoria op = new Operatoria(cliente.getNumero_cliente(),
+									cliente.getTipo_documento(),
+									cliente.getCondicion_impositiva().letra(),
+									cliente.getDocumento(),
+									LocalDate.now(),
+									total);
+		
+		return op;
 	}
 
 

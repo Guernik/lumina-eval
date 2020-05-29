@@ -1,9 +1,12 @@
 package lumina.facturacion;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.concurrent.Callable;
 
+import lumina.model.Cliente;
 import lumina.model.Money;
+import lumina.model.Operatoria;
 import lumina.model.documentos_comerciales.factura.Factura;
 import lumina.model.documentos_comerciales.notacredito.CabeceraNotaCredito;
 import lumina.model.documentos_comerciales.notacredito.NotaCredito;
@@ -26,9 +29,31 @@ public class ProcesarCancelacion implements Callable<NotaCredito> {
 		
 		NotaCredito nota_credito = new NotaCredito(cabecera, pie);
 		
+		Operatoria operatoria = construirOperatoria(factura.getPieFactura().getTotal());
+		
+		OperatoriaDiaria.getInstance().getDailyOperations().put(operatoria);
+		
 		
 		return nota_credito;
 	}
+	
+	
+	private Operatoria construirOperatoria(Money total) {
+		Cliente cliente = factura.getCabeceraFactura().getCliente();
+		BigDecimal montoNegativo = total.getAmount().multiply(BigDecimal.valueOf(-1));
+		Money nuevoMonto = new Money(total.getCurrency(),montoNegativo);
+		
+		
+		Operatoria op = new Operatoria(cliente.getNumero_cliente(),
+									cliente.getTipo_documento(),
+									cliente.getCondicion_impositiva().letra(),
+									cliente.getDocumento(),
+									LocalDate.now(),
+									nuevoMonto);
+		
+		return op;
+	}
+
 
 	
 	
@@ -41,6 +66,8 @@ public class ProcesarCancelacion implements Callable<NotaCredito> {
 				factura.getCabeceraFactura().getCliente().getCondicion_impositiva().letra(),
 				factura.getCabeceraFactura().getCliente());		
 	}
+	
+	
 
 	
 	private PieNotaCredito construirPie() {

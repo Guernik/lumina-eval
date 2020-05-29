@@ -22,7 +22,6 @@ public final class Cliente {
 	
 	public Cliente(Long numero_cliente, String domicilio, ECondicionImpositiva condicion_impositiva,
 			ETipoDocumento tipo_documento, String documento) {
-		super();
 		this.numero_cliente = numero_cliente;
 		this.domicilio = domicilio;
 		this.condicion_impositiva = condicion_impositiva;
